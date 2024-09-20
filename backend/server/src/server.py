@@ -1,6 +1,7 @@
 #FastAPI imports
 from fastapi import FastAPI, Depends, HTTPException, File, UploadFile, Form
 from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 #Local imports 
 from models.Prediction import Predict
@@ -23,6 +24,20 @@ CLASS_NAMES = {
 }
 
 app = FastAPI()
+
+# Add CORS middleware
+origins = [
+    "http://localhost:8080",  # Allow frontend's origin
+    # You can add more origins if needed
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
 
 def draw_predictions_on_image(img, predictions, confidence_limit):
     # Create a drawing context to overlay predictions
