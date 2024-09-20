@@ -1,5 +1,5 @@
 #FastAPI imports
-from fastapi import FastAPI, Depends, HTTPException, File, UploadFile
+from fastapi import FastAPI, Depends, HTTPException, File, UploadFile, Form
 from fastapi.responses import JSONResponse
 
 #Local imports 
@@ -29,10 +29,10 @@ app = FastAPI()
 @app.post("/predict")
 async def predict_image(
     image: UploadFile = File(...),
-    confidence: float = 0.25,
+    confidence_limit: float = Form(..., description="Confidence limit for predictions"),
     db: Session = Depends(get_db)
 ):
-    try: 
+    try:
         #Ensure file in request is an image
         if image.content_type not in ["image/jpeg", "image/jpg", "image/png"]:
             raise HTTPException(status_code=400, detail="File Type Not Supported")
@@ -42,30 +42,34 @@ async def predict_image(
         img = Image.open(BytesIO(image_data))
 
         #Calling the inference function with image and confidence
-        predictions = tensor_predict(
-            img, 
-            confidence
-        )
+        predictions = tensor_predict(img)
 
         # Formatting the predictions for response
         result_data = []
         for prediction in predictions:
             x_min, y_min, x_max, y_max, confidence, class_id = prediction.tolist()
 
-            class_id = int(class_id)
-            label = CLASS_NAMES.get(class_id, "unknown")
+            #only consider limits with confidence limit 
+            if confidence >= confidence_limit:
+                class_id = int(class_id)
+                label = CLASS_NAMES.get(class_id, "unknown")
 
-            result = {
-                "bounding_box": {
-                    "x_min": float(x_min), 
-                    "y_min": float(y_min), 
-                    "x_max": float(x_max), 
-                    "y_max": float(y_max)
-                },
-                "confidence": float(confidence),
-                "label": label
-            }
-            result_data.append(result)
+                result = {
+                    "bounding_box": {
+                        "x_min": float(x_min), 
+                        "y_min": float(y_min), 
+                        "x_max": float(x_max), 
+                        "y_max": float(y_max)
+                    },
+                    "confidence": float(confidence),
+                    "label": label
+                }
+                result_data.append(result)
+
+        new_data = Predict(data = result_data)
+        db.add(new_data)
+        db.commit()
+        db.refresh(new_data)
         
         return JSONResponse(content={"predictions": result_data})
     except Exception as e:

@@ -1,10 +1,9 @@
 from pydantic import BaseModel
+from typing import Any
 
 class PredictionStore(BaseModel):
-    xmin: float
-    ymin: float
-    xmax: float
-    ymax: float
-    confidence: float
-    class_id: int
-    class_name: str
+    id: int
+    data: Any  # This will hold the JSON data
+
+    class Config:
+        orm_mode = True
