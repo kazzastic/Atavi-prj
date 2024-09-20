@@ -1,19 +1,22 @@
 <template>
   <div id="app">
     <PredictComponent />
+    <VisualizeComponent />
   </div>
 </template>
 
 <script>
-import PredictComponent from "./components/PredictComponent.vue";
+import PredictComponent from './components/PredictComponent.vue';
+import VisualizeComponent from './components/VisualizeComponent.vue';
 
 export default {
   components: {
     PredictComponent,
+    VisualizeComponent,
   },
 };
 </script>
 
 <style>
-/* You can add some styling here if you want */
+/* Add global styles if needed */
 </style>
