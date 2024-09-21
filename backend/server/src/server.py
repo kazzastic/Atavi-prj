@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
 import json
+import traceback
 
 CLASS_NAMES = {
     0: "Missing_hole", 
@@ -27,7 +28,8 @@ app = FastAPI()
 
 # Add CORS middleware
 origins = [
-    "http://localhost:8080",  # Allow frontend's origin
+    "http://localhost:8080",
+    "http://localhost:8081"    # Allow frontend's origin
     # You can add more origins if needed
 ]
 
@@ -115,6 +117,7 @@ async def predict_image(
         
         return JSONResponse(content={"predictions": result_data})
     except Exception as e:
+        print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"An error ocurred: {str(e)}")
     
 @app.post('/visualize')
@@ -171,4 +174,5 @@ async def visualize_image(
         return StreamingResponse(buf, media_type="image/jpeg")
         
     except Exception as e:
+        print(traceback.print_exc())
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
