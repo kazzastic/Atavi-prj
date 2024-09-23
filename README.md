@@ -1,5 +1,7 @@
 # Atavi-prj
 
+Deployed: http://34.38.123.215:8081/
+
 This is an application consisting of three parts, 
 1. Training (ultralytics and YOLOv10)
 2. Backend (FastAPI)
