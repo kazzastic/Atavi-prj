@@ -71,7 +71,7 @@ export default {
       formData.append("confidence_limit", this.visualizeConfidence);
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/visualize", {
+        const response = await fetch("http://34.38.123.215:8000/visualize", {
           method: "POST",
           body: formData,
         });
